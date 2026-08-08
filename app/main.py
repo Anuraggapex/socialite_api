@@ -67,7 +67,7 @@ def get_latest_post():
 
 @app.get("/posts/{id}")
 def get_post(id: int):
-    cursor.execute("""SELECT * FROM posts WHERE id = %s """, (str(id),))
+    cursor.execute("""SELECT * FROM posts WHERE "id " = %s """, (id,))
     test_post = cursor.fetchone()
     
     if not test_post:
@@ -78,29 +78,30 @@ def get_post(id: int):
         
     return {"post_detail": test_post}
 
-# --- UPDATED FOR PART 41 ---
 @app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int):
-    cursor.execute("""DELETE FROM posts WHERE id = %s RETURNING *""", (str(id),))
+    cursor.execute("""DELETE FROM posts WHERE "id " = %s RETURNING * """, (id,))
     deleted_post = cursor.fetchone()
     
-    if deleted_post is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, 
-            detail=f"post with id: {id} does not exist"
-        )
+    if deleted_post == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= f"post with id: {id} does not exsist")
 
     conn.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
+
 @app.put("/posts/{id}")
 def uppdate_posts(id: int, post: post):
-    index=find_index_post(id)
+    cursor.execute(
+        """UPDATE posts SET title = %s, content = %s, published = %s WHERE "id " = %s RETURNING * """,
+        (post.title, post.content, post.published, id)
+    )
+    updated_post = cursor.fetchone()
 
-    if index==None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= f"post with id: {id} does not exsist")
-
-    post_dict=post.dict()
-    post_dict['id']=id
-    my_posts[index]=post_dict
-    return{"data": post_dict}
+    if updated_post == None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail=f"post with id: {id} does not exsist"
+        )
+    conn.commit()
+    return {"data": updated_post}
