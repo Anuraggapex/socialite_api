@@ -12,4 +12,4 @@ app.include_router(user.router)
 
 @app.get("/")
 def read_root():
-    return {"message":"Helo World"}
+   return {"message": "Welcome to my FastAPI application!"}
