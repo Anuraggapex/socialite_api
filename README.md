@@ -25,14 +25,14 @@ Follow these steps to run the API locally on your machine:
 ### 1. Clone the Repository
 ```bash
 git clone https://github.com
-cd socialite-api
+cd socialite_api
 ```
 
 ### 2. Set Up a Virtual Environment
 ```bash
 # Windows
 python -m venv venv
-venv\Scripts\activate
+.\venv\Scripts\activate
 
 # Mac/Linux
 python3 -m venv venv
